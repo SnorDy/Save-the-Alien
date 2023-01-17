@@ -8,31 +8,31 @@ import sqlite3
 import os
 
 
-class Alien(pygame.sprite.Sprite):# класс главного персонажа
+class Alien(pygame.sprite.Sprite):  # класс главного персонажа
     def __init__(self):
         super().__init__()
         self.frames = dict()
-        #загрузка списков с кадрами анимации главного героя
+        # загрузка списков с кадрами анимации главного героя
         self.anim_set_up = [pygame.transform.scale(load_image(os.path.abspath(f'data\\alien_up{i}.png')),
                                                    (70, 70)) for i in range(3)]
         self.anim_set_up_l = [pygame.transform.scale(load_image(os.path.abspath(f'data\\alien_up_l{i}.png')),
                                                      (70, 70)) for i in range(3)]
         self.anim_set_up_r = [pygame.transform.scale(load_image(os.path.abspath(f'data\\alien_up_r{i}.png')),
                                                      (70, 70)) for i in range(3)]
-        self.anim_set_down=[pygame.transform.scale(load_image(os.path.abspath(f'data\\alien_down{i}.png')),
+        self.anim_set_down = [pygame.transform.scale(load_image(os.path.abspath(f'data\\alien_down{i}.png')),
                                                      (70, 70)) for i in range(3)]
-        self.anim_set_down_l=[pygame.transform.scale(load_image(os.path.abspath(f'data\\alien_down_l{i}.png')),
-                                                     (70, 70)) for i in range(3)]
-        self.anim_set_down_r=[pygame.transform.scale(load_image(os.path.abspath(f'data\\alien_down_r{i}.png')),
-                                                     (70, 70)) for i in range(3)]
-        for el in ['front1', 'l1', 'r1',]:
+        self.anim_set_down_l = [pygame.transform.scale(load_image(os.path.abspath(f'data\\alien_down_l{i}.png')),
+                                                       (70, 70)) for i in range(3)]
+        self.anim_set_down_r = [pygame.transform.scale(load_image(os.path.abspath(f'data\\alien_down_r{i}.png')),
+                                                       (70, 70)) for i in range(3)]
+        for el in ['front1', 'l1', 'r1', ]:
             self.frames[el] = pygame.transform.scale(load_image(os.path.abspath(f'data\\alien_{el}.png')), (70, 70))
         self.cur_frame = 'front1'
         self.image = self.frames[self.cur_frame]
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = pygame.mouse.get_pos()
         self.status = 1
-        self.k=0
+        self.k = 0
         self.mask = pygame.mask.from_surface(self.image)
 
     def update(self):
@@ -57,14 +57,14 @@ class Alien(pygame.sprite.Sprite):# класс главного персонаж
                 self.cur_frame = self.anim_set_up_r
             self.rect.x = self.x
             self.rect.y = self.y
-            if isinstance(self.cur_frame,list):
-                self.image = self.cur_frame[self.k//24]
+            if isinstance(self.cur_frame, list):
+                self.image = self.cur_frame[self.k // 24]
             else:
                 self.image = self.frames[self.cur_frame]
             self.mask = pygame.mask.from_surface(self.image)
 
 
-class Button(pygame.sprite.Sprite):# универсальный класс  для создания кнопок
+class Button(pygame.sprite.Sprite):  # универсальный класс  для создания кнопок
     def __init__(self, text, func=print):
         super().__init__()
         font = pygame.font.Font('font/20960.ttf', 30)
@@ -76,7 +76,7 @@ class Button(pygame.sprite.Sprite):# универсальный класс  дл
         self.rect.y = 300
         self.text_rect.x = self.rect.x + 20
         self.text_rect.y = self.rect.y + 5
-        self.image.fill((100,200,200))
+        self.image.fill((100, 200, 200))
         self.func = func
 
     def update(self):
@@ -86,13 +86,13 @@ class Button(pygame.sprite.Sprite):# универсальный класс  дл
                 self.func()
 
 
-def start_btn_func():# функция для кнопки старта, передается в конструктор Button()
+def start_btn_func():  # функция для кнопки старта, передается в конструктор Button()
     global start_page
     start_page = False
     pygame.mouse.set_visible(False)
 
 
-class Bullets(pygame.sprite.Sprite):#класс пуль
+class Bullets(pygame.sprite.Sprite):  # класс пуль
     def __init__(self):
         super().__init__(bullets)
         self.size = randint(9, 12)
@@ -112,8 +112,10 @@ class Bullets(pygame.sprite.Sprite):#класс пуль
         self.image.fill('blue')
 
     def update(self):
-        if alien and pygame.sprite.collide_mask(self, alien):#проверка на столкновение с персонажем
+        if alien and pygame.sprite.collide_mask(self, alien):  # проверка на столкновение с персонажем
             alien.status = 0
+            print(alien.x,alien.y,self.rect.x,self.rect.y)
+            print(alien.rect,self.rect)
         self.rect.x += self.speed_x
         self.rect.y += self.speed_y
         # удаление объекта из группы, если он за пределами экрана
@@ -123,26 +125,34 @@ class Bullets(pygame.sprite.Sprite):#класс пуль
 
 class GameOver():
     def __init__(self):
-        sc.fill('white')
+        sc.fill((100,200,250))
         font = pygame.font.Font('font/20960.ttf', 30)
         self.text = font.render('Конец игры!', True, (0, 0, 0))
         sc.blit(self.text, (170, 150))
+        res= results_func()
+        self.result1=font.render(res[0],True,(0,0,0))
+        self.result2 = font.render(res[1], True, (0, 0, 0))
+        self.result3 = font.render(res[2], True, (0, 0, 0))
+        sc.blit(self.result1,(170,210))
+        sc.blit(self.result2,(170,250))
+        sc.blit(self.result3, (170, 290))
 
 
-class Timer():# класс таймера для контроля времени в игре
+
+class Timer():  # класс таймера для контроля времени в игре
     def __init__(self):
         self.start_time = time.time()
         font = pygame.font.Font('font/20960.ttf', 30)
 
     def update(self):
-        elapsed_time = time.time() - self.start_time
-        str_time = time.strftime("%M:%S", time.gmtime(elapsed_time))
+        self.elapsed_time = time.time() - self.start_time
+        str_time = time.strftime("%M:%S", time.gmtime(self.elapsed_time))
         font = pygame.font.Font('font/20960.ttf', 30)
         self.text = font.render(str_time, True, (0, 0, 0))
         sc.blit(self.text, (400, 0))
 
 
-def load_image(name, colorkey=None):# функция загрузки изображений
+def load_image(name, colorkey=None):  # функция загрузки изображений
     fullname = os.path.join('data', name)
     # если файл не существует, то выходим
     if not os.path.isfile(fullname):
@@ -152,56 +162,78 @@ def load_image(name, colorkey=None):# функция загрузки изобр
     return image
 
 
+def results_func():#работа с файлом сохранения рекордов
+    with open('results.txt', mode='r') as file:
+        results = list(map(lambda x: float(x.split()[1]), file.readlines()))#загрузка данных из файла
+        results.append(timer.elapsed_time)
+        results_for_display =list(map(lambda x: ' '.join((str(x[0] + 1) + '.', time.strftime("%M:%S", time.gmtime(x[1])))),
+                           enumerate(sorted(results, reverse=True)[:-1])))# список для вывода на экран
+        results = '\n'.join(list(map(lambda x: str(x[0] + 1) + '. ' + str(x[1]),# список для сохранения  в файл
+                                     enumerate(sorted(results, reverse=True)[:-1]))))
+        file.close()
+        with open('results.txt', mode='w') as file:
+            file.writelines(results)
+            file.close()
+        return results_for_display
+
+
 if __name__ == '__main__':
     pygame.init()
     bullets = pygame.sprite.Group()
-    pygame.init()
     clock = pygame.time.Clock()
     sc = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     alien = Alien()
-    start_page = True  # флаг для проверки стартового окна
+    start_page = True
+    end = 0# флаг для проверки стартового окна
     start_btn = Button('Начать игру', start_btn_func)
     running = True
-    second = 800#задержка времени перед созданием новых пуль
+    second = 800  # задержка времени перед созданием новых пуль
     timer = False
     bg = load_image(os.path.abspath(f'data\\background2.png'))
     last = pygame.time.get_ticks()
     while running:
-        sc.blit(bg, (0, 0))
         if start_page:  # работа со стартовым окном
-            sc.blit(start_btn.image, start_btn.rect)#отображение кнопки и текста на ней
+            sc.blit(bg, (0, 0))
+            sc.blit(start_btn.image, start_btn.rect)  # отображение кнопки и текста на ней
             sc.blit(start_btn.text, start_btn.text_rect)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                     break
             start_btn.update()
-        else:  # сама игра
-            if not (timer):#создание таймера, начало отчета после нажатия кнопки старта
+        elif alien.status:  # сама игра
+            sc.blit(bg, (0, 0))
+            if not (timer):  # создание таймера, начало отчета после нажатия кнопки старта
                 timer = Timer()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                     break
-                if event.type == pygame.MOUSEMOTION and alien:#обновление персонажа при движении мышки
+                if event.type == pygame.MOUSEMOTION and alien:  # обновление персонажа при движении мышки
                     alien.update()
             sc.blit(alien.image, pygame.mouse.get_pos())
             now = pygame.time.get_ticks()
             if now - last >= second:  # задержка времени перед созданием новых пуль
                 for i in range(2):
                     Bullets()
-                last = pygame.time.get_ticks()#обнуление таймера с момента отрисовки пуль
+                last = pygame.time.get_ticks()  # обнуление таймера с момента отрисовки пуль
             bullets.update()
             bullets.draw(sc)
             timer.update()
-        if not (alien.status):# проверка на конец игры
-            sc.fill('white')
+        if not (alien.status):  # проверка на конец игры
+            if not (end):
+                sc.fill('white')
+                GameOver()
+                end=1
             pygame.mouse.set_visible(True)
-            GameOver()
-        clock.tick(60)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    break
         pygame.display.flip()
-        alien.k+=1#переменная для контроля времени смены кадров анимации
-        if alien.k==49:
-            alien.k=0
+        clock.tick(60)
+        alien.k += 1  # переменная для контроля времени смены кадров анимации
+        if alien.k == 49:
+            alien.k = 0
     pygame.quit()
     sys.exit()
